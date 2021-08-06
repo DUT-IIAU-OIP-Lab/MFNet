@@ -53,7 +53,7 @@ We offer our saliency maps and checkpoints on various backbones (including Dense
 ### Saliency maps
 link: https://pan.baidu.com/s/1IRTEaEicYaCJ2TYjZV1lZA.    code: oipw
 ### Checkpoints
-link: https://pan.baidu.com/s/1QvZK91a1cyAYAan2s9quBw.    code: oipw
+link: https://pan.baidu.com/s/1HrCgp0RirOWqkmj6r77wQw.    code: oipw
 
 ## Contact me
 If you have any questions, please contact me: [jiangnanyimi@163.com].
