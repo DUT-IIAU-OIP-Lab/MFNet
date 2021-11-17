@@ -17,7 +17,7 @@ def main():
     # from utils.crf import crf
     from utils.imsave import imsave
     from utils.pamr import BinaryPamr
-    from utils.slic import run_slic_with_crf
+
     from utils.datainit import traindatainit
     from model.MFNet_densenet import MFNet
     from torch.utils.data import DataLoader
@@ -36,7 +36,7 @@ def main():
     parser.add_argument('--batch', type=int, default=25, help='batch size')
     parser.add_argument('--max_epoch', type=int, default=10, help='the max epoch')
     parser.add_argument('--k', type=int, default=30, help='the extra epoch of train stage n')
-    parser.add_argument('--val', type=bool, default=True, help='whether validation or not')
+    parser.add_argument('--val', type=bool, default=False, help='whether validation or not')
     parser.add_argument('--data_root', type=str, default='data', help='path to infer and train data')
     args = parser.parse_args()
     print(args)
@@ -46,15 +46,12 @@ def main():
     # ------------------------------------------------ dataloaders ------------------------------------------------- #
     infersal_loader = DataLoader(MySalInferData(args.data_root, transform=True), batch_size=args.batch,
                                  shuffle=False, num_workers=args.num_workers, pin_memory=True)
-    valsal_loader = DataLoader(MySalValData(args.data_root, resize=args.resize, transform=True),
-                               batch_size=1, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     # -------------------------------------------------- networks -------------------------------------------------- #
     model_sal = MFNet()
     model_sal = model_sal.cuda()
 
     # -------------------------------------------------- training -------------------------------------------------- #
 
-    
     print('\n[ Training a saliency network using pseudo labels. ]\n')
     for i in range(1, (args.sal_stage*2)):
 
@@ -71,6 +68,9 @@ def main():
 
             if not args.val:
                 valsal_loader = None
+            else:
+                valsal_loader = DataLoader(MySalValData(args.data_root, resize=args.resize, transform=True),
+                                           batch_size=1, shuffle=False, num_workers=args.num_workers, pin_memory=True)
             training = TrainSal(
                 model=model_sal,
                 optimizer_model=optimizer_model,
@@ -123,6 +123,7 @@ def main():
             torch.cuda.empty_cache()
 
             # Performing superpixel-wise refinements as well as CRF on the generated saliency maps.
+            from utils.slic import run_slic_with_crf
             print('\nInferring superpixel-wise pseudo labels .....   \n[  ', end='')
             start_time = time.time()
             run_slic_with_crf(img_root='data/DUTS-train/image',
